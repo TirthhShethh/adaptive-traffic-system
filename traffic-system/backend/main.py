@@ -69,6 +69,13 @@ class TrafficSystem:
 
         self.algorithm.update_signals(self.grid.get_all_intersections())
 
+        def get_next_dir(curr_x, curr_y, next_x, next_y):
+            if next_y < curr_y: return "SOUTH"
+            if next_y > curr_y: return "NORTH"
+            if next_x > curr_x: return "WEST"
+            if next_x < curr_x: return "EAST"
+            return random.choice(["NORTH", "SOUTH", "EAST", "WEST"])
+
         for intersection in self.grid.get_all_intersections():
             if intersection.state["N_S"] == LightState.GREEN and not intersection.transitioning:
                 for direction in ["NORTH", "SOUTH"]:
@@ -79,7 +86,8 @@ class TrafficSystem:
                         if next_target:
                             next_int = self.grid.get_intersection(next_target[0], next_target[1])
                             if next_int:
-                                next_int.enqueue("NORTH", vehicle)
+                                next_dir = get_next_dir(intersection.x, intersection.y, next_int.x, next_int.y)
+                                next_int.enqueue(next_dir, vehicle)
                         else:
                             if vehicle in self.vehicles:
                                 self.vehicles.remove(vehicle)
@@ -93,7 +101,8 @@ class TrafficSystem:
                         if next_target:
                             next_int = self.grid.get_intersection(next_target[0], next_target[1])
                             if next_int:
-                                next_int.enqueue("EAST", vehicle)
+                                next_dir = get_next_dir(intersection.x, intersection.y, next_int.x, next_int.y)
+                                next_int.enqueue(next_dir, vehicle)
                         else:
                             if vehicle in self.vehicles:
                                 self.vehicles.remove(vehicle)
@@ -123,26 +132,34 @@ system = TrafficSystem()
 
 async def simulation_loop():
     while True:
-        if system.active:
-            system.simulate_step()
-            state = system.get_state()
-            state_json = json.dumps(state)
-            
-            disconnected = []
-            for client in system.clients:
-                try:
-                    await client.send_text(state_json)
-                except Exception:
-                    disconnected.append(client)
-            
-            for d in disconnected:
-                system.clients.remove(d)
+        try:
+            if system.active:
+                system.simulate_step()
+                state = system.get_state()
+                state_json = json.dumps(state)
+                
+                disconnected = []
+                for client in system.clients:
+                    try:
+                        await client.send_text(state_json)
+                    except Exception:
+                        disconnected.append(client)
+                
+                for d in disconnected:
+                    system.clients.remove(d)
 
-        await asyncio.sleep(system.tick_rate)
+            await asyncio.sleep(system.tick_rate)
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            await asyncio.sleep(1)
+
+simulation_task = None
 
 @app.on_event("startup")
 async def startup_event():
-    asyncio.create_task(simulation_loop())
+    global simulation_task
+    simulation_task = asyncio.create_task(simulation_loop())
 
 @app.get("/api/state")
 def get_state():

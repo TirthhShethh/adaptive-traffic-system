@@ -24,7 +24,7 @@ export default function GridVisualizer({ grid }) {
               <div className="absolute inset-y-0 w-10 left-1/2 -ml-5 bg-slate-800 border-x border-slate-700 pointer-events-none z-0"></div>
 
               {/* Signals */}
-              <div className="z-10 shadow-2xl p-2.5 rounded-xl bg-slate-950 flex flex-col gap-2 ring-1 ring-slate-800/80 transform shadow-[0_8px_30px_rgb(0,0,0,0.5)]">
+              <div className="z-10 p-2.5 rounded-xl bg-slate-950 flex flex-col gap-2 ring-1 ring-slate-800/80 transform shadow-[0_8px_30px_rgb(0,0,0,0.5)]">
                 <span className="text-[10px] text-slate-400 uppercase font-mono tracking-widest absolute -top-7 whitespace-nowrap -ml-2">INT {intersection.x}.{intersection.y}</span>
                 
                 {/* NS Light */}
