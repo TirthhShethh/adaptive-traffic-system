@@ -141,7 +141,7 @@ async def simulation_loop():
                 disconnected = []
                 for client in system.clients:
                     try:
-                        await client.send_text(state_json)
+                        await asyncio.wait_for(client.send_text(state_json), timeout=0.5)
                     except Exception:
                         disconnected.append(client)
                 
