@@ -24,5 +24,5 @@ A full-stack simulation of an adaptive traffic signal control system for a 3x3 u
    ```bash
    docker-compose up --build
    ```
-4. Access the Dashboard: [http://localhost:5173](http://localhost:5173)
+4. Access the Dashboard: [http://localhost:5173](http://localhost:5175)
 5. Access the Backend API documentation (Swagger UI): [http://localhost:8000/docs](http://localhost:8000/docs)
